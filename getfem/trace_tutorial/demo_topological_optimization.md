@@ -41,6 +41,10 @@
 
 ![demo_topological_optimization.gif](demo_topological_optimization.gif)
 
+登場するオブジェクト
+
+![objects](demo_topological_optimization.drawio.png)
+
 コード冒頭：
 
 ```MATLAB
