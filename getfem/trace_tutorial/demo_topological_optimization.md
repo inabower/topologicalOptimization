@@ -5,13 +5,19 @@
 また、もし記載されている内容で間違いを発見した場合には優しい言葉で訂正いただくと嬉しいです。
 
 
-### あとで調べるリスト
+### 勉強リスト：教材
 
-- 有限要素法（←
-- トポロジー最適化
-- FEM手法
-- 積分手法
+- 有限要素法：（書籍）[非線形有限要素法のための連続体力学/Javier Bonet, Richard D. Wood](amazon.co.jp/dp/4627675127)
+- トポロジー最適化：（書籍）[トポロジー最適化/西脇 眞二](amazon.co.jp/dp/4621086340)
+- GetFEMのFEM手法：（web）[付録A.有限要素法リスト](https://getfem.readthedocs.io/ja/latest/userdoc/appendixA.html)
+- GetFEMの積分手法：（web）[付録B.立体求積法のリスト](https://getfem.readthedocs.io/ja/latest/userdoc/appendixB.html)
 - レベルセット法
+
+### 疑問点
+
+- `MeshFem.eval()`で使用する変数は空になってしまうけどこれでいいのか。うまい使い方は？
+- `gf.asm_???(~~)`と`gf.asm('???',~~)`みたいに2パターンあるけどこれはどちらのほうがいいのか
+- 
 
 # モチベーション
 
