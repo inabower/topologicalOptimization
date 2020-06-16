@@ -312,6 +312,9 @@ $$ U_0 = 0.4 * ( 3 * sin( \pi * (x+y) ) + (x-0.5)^{10} + (y-0.5)^{10} + (x+0.5)^
 
 そしてこれを解き、得られるUでこれから何かを行うようです。
 
+`MeshFem.eval()`の後ではその中で使用したxとyの中身がなくなっていることを確認済み。
+通常のevalと違う扱いに注意する必要がありそう。
+
 ## アジョイント法とトポロジー勾配の計算
 
 - matlab/octave ーーーーーーーーーーーーーーーーーーーーーーーーーー
@@ -371,11 +374,27 @@ $$ U_0 = 0.4 * ( 3 * sin( \pi * (x+y) ) + (x-0.5)^{10} + (y-0.5)^{10} + (x+0.5)^
 
 さっきのUをmf_basicのメッシュに合うように内挿している感じでしょうか。それを二倍した上で先程のモデルのVolumicDataにしています。そしてそこで得られた`u`は`W`としてこの後使用されるようです。
 
+ここで更にあたらしい`MeshFem`の`mf_g`を使用するようです。
+`FEM_PRODUCT()`でプリズム上のLagrande要素を構成するとのこと。[付録A.有限要素法リスト](https://getfem.readthedocs.io/ja/latest/userdoc/appendixA.html)
 
+|degree|dimension|d.o.f. number|class|vector|τ-equivalent|Polynomial|
+|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+|$K_1+K_2, 0≤K_1,K_2≤255$|$P ,  2≤P≤255$|$(K_2)+1×\frac{(K_1+P-1)!}{K_1!(P-1)!}$|$C^0$|No $(Q=1)$|Yes $(M=Id)$|Yes|
 
-## 
+この高次要素を使ってUとWの勾配を算出している感じでしょうか。
 
-- matlab/octave ーーーーーーーーーーーーーーーーーーーーーーーーーー
+その後、`compute_interpolate_on()`でUとU0とULSを`mf_g`にマッピングして、
+最終的にこれらからGを算出しているようです。
+
+When $LS>0$
+$$ G = -4 \pi ( \alpha ( DU_x^2 + DU_y^2 + DU_x DW_x + DU_y DW_y ) + \beta ( UU - UU_0 )^2 )  $$
+
+When $LS<0$
+$$ G = 0 $$
+
+## 終了判定と結果の書き出し
+
+- matlab/octave
 
 ```MATLAB
   subplot(2,1,2);
@@ -403,7 +422,7 @@ $$ U_0 = 0.4 * ( 3 * sin( \pi * (x+y) ) + (x-0.5)^{10} + (y-0.5)^{10} + (x+0.5)^
   ULS = min(ULS, ((x - xc).^2 + (y - yc).^2) - R^2);
 ```
 
-- Python ーーーーーーーーーーーーーーーーーーーーーーーーーー
+- Python
 
 ```python
     val = G.min()
@@ -427,3 +446,10 @@ $$ U_0 = 0.4 * ( 3 * sin( \pi * (x+y) ) + (x-0.5)^{10} + (y-0.5)^{10} + (x+0.5)^
     mf_g.export_to_vtk(f'fig/LS_{col:03d}.vtk', LS, 'LS')
     mf_ls.export_to_vtk(f'fig/ULS_{col:03d}.vtk', ULS, 'ULS')
 ```
+
+このGの最小値とその値を取得しています。
+最小値が-12以上の時にループを抜ける処理をしているようです。
+
+継続される場合はULSが更新されています。
+ちなみにMatolabの時とは異なりPythonではx,yの値が空になっていたので入れ直しています。
+（MeshFem.evalのところが原因でした。）
